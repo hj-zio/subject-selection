@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>논산대건고등학교 교육과정 과목선택 포털</title>
+<title>논산대건고등학교 교육과정 과목선택</title>
 <script src="https://accounts.google.com/gsi/client" async></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -20,27 +20,52 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Pretendard', -apple-system, sans-serif; background: var(--bg); color: var(--text-main); line-height: 1.5; }
 
-/* 화면 전환 */
-.screen { display: none !important; opacity: 0; transition: opacity 0.25s ease; }
-.screen.active { display: block !important; opacity: 1; }
+
+.screen { display: none !important; opacity: 0; }
+.screen.active { display: block !important; opacity: 1; animation: fadeIn 0.3s ease; }
+.screen.active#sc-login,
+.screen.active.center-wrap { display: flex !important; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* 로그인 화면 */
-#sc-login { min-height: 100vh; display: flex !important; align-items: center; justify-content: center; padding: 20px; }
-#sc-login:not(.active) { display: none !important; }
+#sc-login { min-height: 100vh; align-items: center; justify-content: center; padding: 20px; }
 .login-card { background: var(--surface); border-radius: 20px; padding: 48px 40px; max-width: 420px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.08); text-align: center; border-top: 8px solid var(--navy); }
 
-/* 메뉴 화면 */
-#sc-year { min-height: 100vh; display: flex !important; align-items: center; justify-content: center; padding: 40px 20px; }
-#sc-year:not(.active) { display: none !important; }
-.portal-container { max-width: 720px; width: 100%; }
-.menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; }
-.menu-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px 24px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
+/* 포털 및 메뉴 화면 공통 */
+.center-wrap { min-height: 100vh; padding: 40px 20px; }
+.center-wrap > .portal-container { margin: auto; max-width: 1000px; width: 100%; }
+.menu-grid { display: grid; gap: 16px; margin-top: 24px; }
+.menu-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px 24px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.03); display: flex; flex-direction: column; }
 .menu-card:hover { border-color: var(--navy); transform: translateY(-3px); box-shadow: 0 10px 15px rgba(0,0,0,0.08); }
+.badge { font-size:0.75em; font-weight:700; padding:3px 10px; border-radius:12px; width: fit-content; margin-bottom: 12px; }
+
+/* 입학년도 선택 대문 */
+.year-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 32px; }
+.year-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 24px;
+  padding: 48px 32px; text-align: center; cursor: pointer; 
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.04); display: flex; flex-direction: column; align-items: center; justify-content: center;
+  position: relative; z-index: 1;
+}
+.year-card:hover { 
+  transform: scale(1.08); 
+  box-shadow: 0 25px 30px -5px rgba(0,0,0,0.15), 0 15px 15px -5px rgba(0,0,0,0.08); 
+  border-color: var(--navy); z-index: 10; 
+}
+.year-card.highlight { border: 3px solid var(--navy); background: linear-gradient(to bottom, #ffffff, #f4f8fc); }
+.year-card.disabled { opacity: 0.55; cursor: not-allowed; background: #f8fafc; }
+.year-card.disabled:hover { transform: none; box-shadow: 0 4px 10px rgba(0,0,0,0.04); border-color: var(--border); z-index: 1; }
+
+.year-title { font-size: 1.6em; font-weight: 800; color: var(--text-main); margin-bottom: 12px; }
+.year-desc { font-size: 0.95em; color: var(--text-sub); line-height: 1.6; }
 
 /* 메인 앱 영역 */
-.app-container { max-width: 1140px; margin: 30px auto; padding: 0 20px; }
+.app-container { max-width: 1140px; margin: 30px auto; padding: 0 20px 40px; }
 .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.btn-back { padding: 8px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; font-weight: 600; cursor: pointer; }
+.btn-back { padding: 8px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+.btn-back:hover { background: #e2e8f0; }
 
 /* 진로 입력 및 프리셋 바 */
 .career-input-area { background: var(--surface); padding: 20px; border-radius: 16px; margin-bottom: 20px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
@@ -108,7 +133,6 @@ input:disabled + div { opacity: 0.35; text-decoration: line-through; }
 
 @media (max-width: 768px) {
   .sub-stats, .report-grid { grid-template-columns: repeat(2, 1fr); }
-  .menu-grid { grid-template-columns: 1fr; }
 }
 @media print {
   .master-dashboard, .tabs, .action-group, .top-nav, .career-input-area { display: none !important; }
@@ -124,36 +148,70 @@ input:disabled + div { opacity: 0.35; text-decoration: line-through; }
 <div id="sc-login" class="screen active">
   <div class="login-card">
     <div style="font-size:0.8em; font-weight:800; color:var(--navy); letter-spacing:1px;">NONSAN DAEGUN HIGH SCHOOL</div>
-    <h1 style="font-size:1.6em; font-weight:800; margin:10px 0;">교육과정 수강신청 포털</h1>
-    <p style="color:var(--text-sub); font-size:0.9em; margin-bottom:30px;">2026학년도 입학생 교육과정 시뮬레이터</p>
+    <h1 style="font-size:1.6em; font-weight:800; margin:10px 0;">교육과정 수강신청 통합포털</h1>
+    <p style="color:var(--text-sub); font-size:0.9em; margin-bottom:30px;">본인의 학교 부여 구글 계정으로 로그인해야해요.</p>
     <div id="g-btn-wrap" style="min-height:44px; display:flex; justify-content:center;">
       <span class="spinner"></span>
     </div>
-    <p style="font-size:0.8em; color:#94a3b8; margin-top:24px;">학교 부여 구글 계정(<b>@pess.cnehs.kr</b>) 전용</p>
+    <p style="font-size:0.8em; color:#94a3b8; margin-top:24px;">(@pess.cnehs.kr 계정 전용)</p>
     <div id="login-status" style="margin-top:14px; font-size:0.85em; font-weight:600;"></div>
   </div>
 </div>
 
-<div id="sc-year" class="screen">
+<div id="sc-main-portal" class="screen center-wrap">
   <div class="portal-container">
     <div style="text-align:center;">
-      <h2 style="font-size:1.8em; font-weight:800; color:var(--navy);">교육과정 설계 마스터</h2>
-      <p style="color:var(--text-sub);">본인의 학적을 확인하고 희망하는 메뉴를 선택해요.</p>
+      <h2 style="font-size:2em; font-weight:800; color:var(--navy);">논산대건고 수강신청 포털</h2>
+      <p style="color:var(--text-sub); font-size:1.05em; margin-top:8px;">본인의 입학 연도에 맞는 시스템을 선택해 주세요.</p>
     </div>
-    <div style="background:var(--surface); padding:14px 20px; border-radius:12px; border:1px solid var(--border); margin-top:24px; display:flex; justify-content:space-between; align-items:center;">
-      <div style="font-weight:700;" id="user-display">사용자 인증 중...</div>
-      <button onclick="location.reload()" class="btn-back" style="font-size:0.8em;">로그아웃</button>
+    
+    <div style="background:var(--surface); padding:16px 24px; border-radius:12px; border:1px solid var(--border); margin-top:32px; display:flex; justify-content:space-between; align-items:center;">
+      <div style="font-weight:700; font-size:1em;" id="user-display-main">사용자 정보 확인 중...</div>
+      <button onclick="location.reload()" class="btn-back" style="font-size:0.85em;">로그아웃</button>
     </div>
-    <div class="menu-grid">
-      <div class="menu-card" onclick="chooseMenu(1)">
-        <span style="background:#e0f2fe; color:#0369a1; font-size:0.75em; font-weight:700; padding:3px 10px; border-radius:12px;">신청접수 중</span>
-        <h3 style="font-size:1.25em; font-weight:800; margin:12px 0 8px;">과목 선택 시뮬레이터 및 제출</h3>
-        <p style="font-size:0.85em; color:var(--text-sub);">계열별 프리셋 가이드를 참고하여 3년간의 이수 학점을 자동 계산하고 설계서를 제출해요.</p>
+    
+    <div class="year-grid">
+      <div class="year-card" onclick="window.open('https://script.google.com/a/macros/pess.cnehs.kr/s/AKfycbw3OJYxvInH1dRXjO-zZwPpuR70aSPbMByvbZIMHIgpChy5vt6lKwggM-CUryASd2BSWg/exec', '_blank')">
+        <span class="badge" style="background:#f1f5f9; color:#475569;">조회 전용 시스템</span>
+        <div class="year-title">2025학년도 입학생</div>
+        <div class="year-desc">기존 시스템으로 이동하여 확정된 2학년 선택과목 내역을 확인해요.</div>
       </div>
-      <div class="menu-card" onclick="chooseMenu(2)">
-        <span style="background:#f1f5f9; color:#475569; font-size:0.75em; font-weight:700; padding:3px 10px; border-radius:12px;">조회 전용</span>
-        <h3 style="font-size:1.25em; font-weight:800; margin:12px 0 8px;">제출 내역 조회 및 출력</h3>
-        <p style="font-size:0.85em; color:var(--text-sub);">서버에 최종 제출된 본인의 과목 이수 내역을 확인하고 A4 출력 또는 엑셀로 저장해요.</p>
+
+      <div class="year-card highlight" onclick="showScreen('sc-2026-menu')">
+        <span class="badge" style="background:#e0f2fe; color:#0369a1;">과목선택 접수중</span>
+        <div class="year-title" style="color:var(--navy); font-size:1.8em;">2026학년도 입학생</div>
+        <div class="year-desc" style="color:var(--text-main); font-weight:600;">2026 신입생 전용 시스템을 통해 3년간의 수강신청을 진행해요.</div>
+      </div>
+
+      <div class="year-card disabled" onclick="alert('2027학년도 입학생 전용 시스템은 현재 오픈 준비 중입니다.')">
+        <span class="badge" style="background:#fef3c7; color:#b45309;">오픈 예정</span>
+        <div class="year-title">2027학년도 입학생</div>
+        <div class="year-desc">내년 입학생을 위한 시스템으로 현재는 접근할 수 없어요.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="sc-2026-menu" class="screen center-wrap">
+  <div class="portal-container" style="max-width: 800px;">
+    <div class="top-nav" style="margin-bottom:0;">
+      <button class="btn-back" onclick="showScreen('sc-main-portal')">← 입학년도 선택으로</button>
+    </div>
+    <div style="text-align:center; margin-top:20px;">
+      <h2 style="font-size:1.8em; font-weight:800; color:var(--navy);">2026학년도 교육과정 설계</h2>
+      <p style="color:var(--text-sub);">희망하시는 메뉴를 선택해요.</p>
+    </div>
+    
+    <div class="menu-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+      <div class="menu-card" onclick="chooseMenu2026(1)">
+        <span class="badge" style="background:#e0f2fe; color:#0369a1;">신청접수 중</span>
+        <h3 style="font-size:1.35em; font-weight:800; margin:0 0 8px;">과목 선택 시뮬레이터 및 제출</h3>
+        <p style="font-size:0.9em; color:var(--text-sub);">계열별 프리셋 가이드를 참고하여 3년간의 이수 학점을 자동 계산하고 과목선택 내역을 제출해요.</p>
+      </div>
+      <div class="menu-card" onclick="chooseMenu2026(2)">
+        <span class="badge" style="background:#f1f5f9; color:#475569;">조회 전용</span>
+        <h3 style="font-size:1.35em; font-weight:800; margin:0 0 8px;">제출 내역 조회 및 출력</h3>
+        <p style="font-size:0.9em; color:var(--text-sub);">서버에 최종 제출된 본인의 과목 이수 내역을 확인하고 A4 출력 또는 엑셀로 저장해요.</p>
       </div>
     </div>
   </div>
@@ -162,7 +220,7 @@ input:disabled + div { opacity: 0.35; text-decoration: line-through; }
 <div id="sc-select" class="screen">
   <div class="app-container">
     <div class="top-nav">
-      <button class="btn-back" onclick="showScreen('sc-year')">← 메뉴 목록으로</button>
+      <button class="btn-back" onclick="showScreen('sc-2026-menu')">← 2026 메뉴로</button>
       <div id="nav-student-info" style="font-weight:700; font-size:0.9em; color:var(--navy);"></div>
     </div>
 
@@ -204,7 +262,7 @@ input:disabled + div { opacity: 0.35; text-decoration: line-through; }
     <div id="view-final" class="screen">
       <div class="report-print-area" id="capture-area">
         <div class="report-header">
-          <h2 style="font-size:1.5em; font-weight:800; color:var(--navy);">2026학년도 입학생 교육과정 이수 설계서</h2>
+          <h2 style="font-size:1.5em; font-weight:800; color:var(--navy);">2026학년도 입학생 교육과정 과목선택</h2>
           <div style="font-size:1.05em; margin:10px 0; font-weight:800;">
             학번·성명: <span id="r-student" style="color:var(--navy)"></span> | 희망 진로: <span id="r-career" style="color:var(--gold); border-bottom:2px solid var(--gold);">미입력</span>
           </div>
@@ -217,12 +275,12 @@ input:disabled + div { opacity: 0.35; text-decoration: line-through; }
 
       <div style="background:var(--surface); padding:24px; border-radius:16px; border:1px solid var(--border); text-align:center;">
         <div class="action-group" style="margin-bottom:16px;">
-          <button class="btn-action" style="background:#166534;" onclick="exportToExcel()"> 엑셀 저장</button>
-          <button class="btn-action" style="background:#1e40af;" onclick="saveAsImage()"> 이미지 저장</button>
-          <button class="btn-action" style="background:#475569;" onclick="window.print()"> A4 출력 / PDF 인쇄</button>
+          <button class="btn-action" style="background:#166534;" onclick="exportToExcel()">엑셀 저장</button>
+          <button class="btn-action" style="background:#1e40af;" onclick="saveAsImage()">이미지 저장</button>
+          <button class="btn-action" style="background:#475569;" onclick="window.print()">A4 출력 / PDF 인쇄</button>
         </div>
         <hr style="border:0; border-top:1px solid var(--border); margin:16px 0;">
-        <button class="btn-action btn-submit-main" id="btn-submit-server" onclick="submitToServer()">선택과목 제출하기</button>
+        <button class="btn-action btn-submit-main" id="btn-submit-server" onclick="submitToServer()">제출하기</button>
         <div id="submit-feedback" style="margin-top:12px; font-size:0.9em; font-weight:700;"></div>
       </div>
     </div>
@@ -232,7 +290,7 @@ input:disabled + div { opacity: 0.35; text-decoration: line-through; }
 <div id="sc-check" class="screen">
   <div class="app-container">
     <div class="top-nav">
-      <button class="btn-back" onclick="showScreen('sc-year')">← 메뉴 목록으로</button>
+      <button class="btn-back" onclick="showScreen('sc-2026-menu')">← 2026 메뉴로</button>
       <div id="check-user-display" style="font-weight:700; color:var(--navy);"></div>
     </div>
     <div id="check-content"></div>
@@ -249,7 +307,6 @@ const CLIENT_ID = '132908628137-396mibqkfq8h1pfbcu56nggbkbt5968i.apps.googleuser
 let idToken = null;
 let studentInfo = null;
 
-// [2026 고유 데이터] 위계성 규칙 및 진로 가이드
 const semesterOrder = ["t1_1", "t1_2", "t2_1", "t2_2", "t3_1", "t3_2"];
 const hierarchyMap = { "역학과 에너지": "물리학", "전자기와 양자": "물리학", "물질과 에너지": "화학", "화학 반응의 세계": "화학", "세포와 물질대사": "생명과학", "생물의 유전": "생명과학", "지구시스템과학": "지구과학", "행성우주과학": "지구과학" };
 const coreGuide = {
@@ -283,9 +340,6 @@ const curriculum = {
 
 const ALL_GROUP_IDS = ['s1_1','s1_2','s2_art1','s2_lib1','s4','s2_art2','s2_lib2','s5','s3_art1','s6','s3_art2','s7','s8'];
 
-// ==========================================
-// Google 로그인 & GAS 통신 엔진
-// ==========================================
 window.addEventListener('load', () => {
   const checkGoogle = setInterval(() => {
     if (typeof google !== 'undefined' && google.accounts) {
@@ -303,19 +357,19 @@ function handleGoogleCredential(response) {
     const payload = JSON.parse(atob(idToken.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
     const email = (payload.email || '').toLowerCase();
     if (!email.endsWith('@pess.cnehs.kr')) {
-      showLoginNotice('학교 공식 계정(@pess.cnehs.kr)으로만 로그인할 수 있어요.', true); return;
+      showLoginNotice('학교에서 발급받은 계정(@pess.cnehs.kr)으로만 로그인할 수 있어요.', true); return;
     }
     showLoginNotice('인증에 성공했어요. 학적 정보를 확인 중이에요...', false);
     callApi('getStudent').then(res => {
       if (res.ok) {
         studentInfo = res;
-        document.getElementById('user-display').textContent = `${res.studentId} ${res.name} (${res.email})`;
-        showScreen('sc-year');
+        document.getElementById('user-display-main').textContent = `${res.studentId} ${res.name} (${res.email})`;
+        showScreen('sc-main-portal');
       } else {
         showLoginNotice(res.message || '등록된 학생 정보가 없어요.', true);
       }
     }).catch(err => showLoginNotice('서버 연결 실패: ' + err.message, true));
-  } catch (e) { showLoginNotice('로그인 처리 중 오류 발생', true); }
+  } catch (e) { showLoginNotice('로그인 처리 중 오류가 발생했어요', true); }
 }
 
 function showLoginNotice(msg, isError) {
@@ -325,6 +379,7 @@ function showLoginNotice(msg, isError) {
 function showScreen(screenId) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(screenId).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' }); // 최상단 스크롤 리셋
 }
 
 function callApi(action, extraData = {}) {
@@ -341,7 +396,7 @@ function callApi(action, extraData = {}) {
   });
 }
 
-function chooseMenu(type) {
+function chooseMenu2026(type) {
   if (type === 1) {
     document.getElementById('nav-student-info').textContent = `${studentInfo.studentId} ${studentInfo.name}`;
     renderSimulator(); showScreen('sc-select'); fetchSavedData();
@@ -351,16 +406,13 @@ function chooseMenu(type) {
   }
 }
 
-// ==========================================
-// [2026 고유 로직] 시뮬레이터 렌더링 및 프리셋
-// ==========================================
 function renderSimulator() {
   const tabBar = document.getElementById('tab-bar'); const contentArea = document.getElementById('content-area');
   tabBar.innerHTML = ''; contentArea.innerHTML = '';
   
   semesterOrder.forEach((sem, idx) => {
     const btn = document.createElement('button'); btn.id = `btn-${sem}`; btn.className = 'tab-btn' + (idx === 0 ? ' active' : '');
-    btn.innerText = sem.replace('t','').replace('_','-');
+    btn.innerText = sem.replace('t','').replace('_','-') + '학기';
     btn.onclick = () => openTab(sem); tabBar.appendChild(btn);
     
     const div = document.createElement('div'); div.id = sem; div.className = 'screen' + (idx === 0 ? ' active' : '');
@@ -383,7 +435,7 @@ function renderSimulator() {
     div.innerHTML = fHtml + cHtml; contentArea.appendChild(div);
   });
   
-  const finalBtn = document.createElement('button'); finalBtn.id = 'btn-final'; finalBtn.className = 'tab-btn'; finalBtn.innerText = '📊 최종 설계서 제출';
+  const finalBtn = document.createElement('button'); finalBtn.id = 'btn-final'; finalBtn.className = 'tab-btn'; finalBtn.innerText = '제출하기';
   finalBtn.onclick = () => openTab('final'); tabBar.appendChild(finalBtn);
   updateUI();
 }
@@ -430,9 +482,6 @@ function handleSelect(el, limit) {
   updateUI();
 }
 
-// ==========================================
-// [2026 고유 연산] 위계성 / 중복 차단 / 학점 합계
-// ==========================================
 function updateUI() {
   let stats = { fixed: 0, select: 0, kms: 0, soc: 0, sci: 0, art: 0, pe: 0, lib: 0 };
   const selBySem = {};
@@ -451,10 +500,8 @@ function updateUI() {
     const name = input.getAttribute('data-name'); const sem = input.getAttribute('data-semester'); const idx = semesterOrder.indexOf(sem);
     const card = input.closest('.subject-card');
     
-    // 학기 간 중복 선택 검증
     let isUsed = false; semesterOrder.forEach(s => { if (s !== sem && selBySem[s].includes(name)) isUsed = true; });
     
-    // 선수과목 위계성 검증
     let isBlocked = false;
     if (hierarchyMap[name]) {
       const req = hierarchyMap[name]; let ok = false;
@@ -509,9 +556,6 @@ function buildReport() {
   });
 }
 
-// ==========================================
-// 기존 내역 연동 및 서버 최종 제출
-// ==========================================
 function fetchSavedData() {
   callApi('getSubmission').then(res => {
     if (res.ok && res.hasSubmitted) {
@@ -537,7 +581,7 @@ async function submitToServer() {
   if (lib < 16) errors.push(`교양 영역 학점 합계는 16학점 이상이어야 해요. (현재 ${lib}학점)`);
   
   if (errors.length > 0) {
-    alert(' 학점 검증 불합격\n\n' + errors.join('\n')); return;
+    alert('⚠️ 학점 검증 불합격\n\n' + errors.join('\n')); return;
   }
   
   const btn = document.getElementById('btn-submit-server'); const fb = document.getElementById('submit-feedback');
@@ -555,7 +599,7 @@ async function submitToServer() {
     });
     const result = await callApi('submit', { selections: payload });
     if (result.ok) {
-      fb.style.color = '#10b981'; fb.textContent = result.message || '이수 설계서 제출이 완벽하게 완료되었어요.';
+      fb.style.color = '#10b981'; fb.textContent = result.message || '이수 설계서 제출이 완료되었어요.';
     } else {
       fb.style.color = '#ef4444'; fb.textContent = result.message || '제출 저장 중 오류가 발생했어요.';
     }
@@ -563,9 +607,6 @@ async function submitToServer() {
   btn.disabled = false;
 }
 
-// ==========================================
-// 내역 출력 및 엑셀 / 이미지 변환
-// ==========================================
 function exportToExcel() {
   const data = [["학기", "진로", document.getElementById('career-name').value], ["학기", "과목명", "유형", "학점", "이수구분"]];
   semesterOrder.forEach(sem => {
