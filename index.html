@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>논산대건고등학교 교육과정 과목선택</title>
+<title>논산대건고등학교 교육과정 수강신청 포털</title>
 <script src="https://accounts.google.com/gsi/client" async></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -19,7 +19,6 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Pretendard', -apple-system, sans-serif; background: var(--bg); color: var(--text-main); line-height: 1.5; }
-
 
 .screen { display: none !important; opacity: 0; }
 .screen.active { display: block !important; opacity: 1; animation: fadeIn 0.3s ease; }
@@ -40,7 +39,7 @@ body { font-family: 'Pretendard', -apple-system, sans-serif; background: var(--b
 .menu-card:hover { border-color: var(--navy); transform: translateY(-3px); box-shadow: 0 10px 15px rgba(0,0,0,0.08); }
 .badge { font-size:0.75em; font-weight:700; padding:3px 10px; border-radius:12px; width: fit-content; margin-bottom: 12px; }
 
-/* 입학년도 선택 대문 */
+/* 입학년도 선택 대문 (Year Card) */
 .year-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 32px; }
 .year-card {
   background: var(--surface); border: 1px solid var(--border); border-radius: 24px;
@@ -148,8 +147,8 @@ input:disabled + div { opacity: 0.35; text-decoration: line-through; }
 <div id="sc-login" class="screen active">
   <div class="login-card">
     <div style="font-size:0.8em; font-weight:800; color:var(--navy); letter-spacing:1px;">NONSAN DAEGEON HIGH SCHOOL</div>
-    <h1 style="font-size:1.6em; font-weight:800; margin:10px 0;">교육과정 과목선택 통합포털</h1>
-    <p style="color:var(--text-sub); font-size:0.9em; margin-bottom:30px;">본인의 학교 부여 구글 계정으로 로그인해야해요.</p>
+    <h1 style="font-size:1.6em; font-weight:800; margin:10px 0;">교육과정 수강신청 통합포털</h1>
+    <p style="color:var(--text-sub); font-size:0.9em; margin-bottom:30px;">학교에서 부여한 구글 계정으로 로그인해주세요.</p>
     <div id="g-btn-wrap" style="min-height:44px; display:flex; justify-content:center;">
       <span class="spinner"></span>
     </div>
@@ -161,7 +160,7 @@ input:disabled + div { opacity: 0.35; text-decoration: line-through; }
 <div id="sc-main-portal" class="screen center-wrap">
   <div class="portal-container">
     <div style="text-align:center;">
-      <h2 style="font-size:2em; font-weight:800; color:var(--navy);">논산대건고 과목선택 포털</h2>
+      <h2 style="font-size:2em; font-weight:800; color:var(--navy);">논산대건고 선택과목 수강신청 포털</h2>
       <p style="color:var(--text-sub); font-size:1.05em; margin-top:8px;">본인의 입학 연도에 맞는 시스템을 선택해 주세요.</p>
     </div>
     
@@ -180,10 +179,10 @@ input:disabled + div { opacity: 0.35; text-decoration: line-through; }
       <div class="year-card highlight" onclick="showScreen('sc-2026-menu')">
         <span class="badge" style="background:#e0f2fe; color:#0369a1;">과목선택 접수중</span>
         <div class="year-title" style="color:var(--navy); font-size:1.8em;">2026학년도 입학생</div>
-        <div class="year-desc" style="color:var(--text-main); font-weight:600;">2026 신입생 전용 시스템을 통해 3년간의 수강신청을 진행해요.</div>
+        <div class="year-desc" style="color:var(--text-main); font-weight:600;">2026 신입생 전용 시뮬레이터를 통해 3년간의 수강신청을 진행해요.</div>
       </div>
 
-      <div class="year-card disabled" onclick="alert('2027학년도 입학생 전용 시스템은 현재 오픈 준비 중입니다.')">
+      <div class="year-card disabled" onclick="alert('2027학년도 입학생 전용 시스템은 현재 오픈 준비 중이에요.')">
         <span class="badge" style="background:#fef3c7; color:#b45309;">오픈 예정</span>
         <div class="year-title">2027학년도 입학생</div>
         <div class="year-desc">내년 입학생을 위한 시스템으로 현재는 접근할 수 없어요.</div>
@@ -198,20 +197,20 @@ input:disabled + div { opacity: 0.35; text-decoration: line-through; }
       <button class="btn-back" onclick="showScreen('sc-main-portal')">← 입학년도 선택으로</button>
     </div>
     <div style="text-align:center; margin-top:20px;">
-      <h2 style="font-size:1.8em; font-weight:800; color:var(--navy);">2026학년도 교육과정 설계</h2>
-      <p style="color:var(--text-sub);">희망하시는 메뉴를 선택해요.</p>
+      <h2 style="font-size:1.8em; font-weight:800; color:var(--navy);">2026학년도 교육과정 과목선택</h2>
+      <p style="color:var(--text-sub);">희망하시는 메뉴를 선택하세요.</p>
     </div>
     
     <div class="menu-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
       <div class="menu-card" onclick="chooseMenu2026(1)">
         <span class="badge" style="background:#e0f2fe; color:#0369a1;">신청접수 중</span>
         <h3 style="font-size:1.35em; font-weight:800; margin:0 0 8px;">과목 선택 시뮬레이터 및 제출</h3>
-        <p style="font-size:0.9em; color:var(--text-sub);">계열별 프리셋 가이드를 참고하여 3년간의 이수 학점을 자동 계산하고 과목선택 내역을 제출해요.</p>
+        <p style="font-size:0.9em; color:var(--text-sub);">계열별 프리셋 가이드를 참고하여 3년간의 이수 학점을 자동 계산하고 설계서를 제출해요.</p>
       </div>
       <div class="menu-card" onclick="chooseMenu2026(2)">
         <span class="badge" style="background:#f1f5f9; color:#475569;">조회 전용</span>
         <h3 style="font-size:1.35em; font-weight:800; margin:0 0 8px;">제출 내역 조회 및 출력</h3>
-        <p style="font-size:0.9em; color:var(--text-sub);">서버에 최종 제출된 본인의 과목 이수 내역을 확인하고 A4 출력 또는 엑셀로 저장해요.</p>
+        <p style="font-size:0.9em; color:var(--text-sub);">서버에 최종 제출된 본인의 과목 이수 내역을 확인하고 A4 또는 엑셀로 저장해요.</p>
       </div>
     </div>
   </div>
@@ -227,7 +226,7 @@ input:disabled + div { opacity: 0.35; text-decoration: line-through; }
     <div class="career-input-area">
       <div class="career-row">
         <span style="font-weight:800; color:var(--navy); min-width:75px;">나의 꿈:</span>
-        <input type="text" id="career-name" placeholder="희망하는 진로를 입력하세요 (예: AI 소프트웨어 개발자, 생명공학자)" oninput="updateUI()">
+        <input type="text" id="career-name" placeholder="희망하는 진로를 입력해요 (예: AI 소프트웨어 개발자, 생명공학자)" oninput="updateUI()">
       </div>
       <div class="preset-group">
         <span style="font-size:0.85em; font-weight:700; color:#64748b; margin-right:4px;">진로 계열 추천:</span>
@@ -262,7 +261,7 @@ input:disabled + div { opacity: 0.35; text-decoration: line-through; }
     <div id="view-final" class="screen">
       <div class="report-print-area" id="capture-area">
         <div class="report-header">
-          <h2 style="font-size:1.5em; font-weight:800; color:var(--navy);">2026학년도 입학생 교육과정 과목선택</h2>
+          <h2 style="font-size:1.5em; font-weight:800; color:var(--navy);">2026학년도 입학생 교육과정 선택과목 설계서</h2>
           <div style="font-size:1.05em; margin:10px 0; font-weight:800;">
             학번·성명: <span id="r-student" style="color:var(--navy)"></span> | 희망 진로: <span id="r-career" style="color:var(--gold); border-bottom:2px solid var(--gold);">미입력</span>
           </div>
@@ -280,7 +279,7 @@ input:disabled + div { opacity: 0.35; text-decoration: line-through; }
           <button class="btn-action" style="background:#475569;" onclick="window.print()">A4 출력 / PDF 인쇄</button>
         </div>
         <hr style="border:0; border-top:1px solid var(--border); margin:16px 0;">
-        <button class="btn-action btn-submit-main" id="btn-submit-server" onclick="submitToServer()">제출하기</button>
+        <button class="btn-action btn-submit-main" id="btn-submit-server" onclick="submitToServer()">최종 과목선택 제출하기</button>
         <div id="submit-feedback" style="margin-top:12px; font-size:0.9em; font-weight:700;"></div>
       </div>
     </div>
@@ -357,9 +356,9 @@ function handleGoogleCredential(response) {
     const payload = JSON.parse(atob(idToken.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
     const email = (payload.email || '').toLowerCase();
     if (!email.endsWith('@pess.cnehs.kr')) {
-      showLoginNotice('학교에서 발급받은 계정(@pess.cnehs.kr)으로만 로그인할 수 있어요.', true); return;
+      showLoginNotice('학교 공식 계정(@pess.cnehs.kr)으로만 로그인할 수 있어요.', true); return;
     }
-    showLoginNotice('인증에 성공했어요. 학적 정보를 확인 중이에요...', false);
+    showLoginNotice('인증 성공! 학적 정보를 확인 중입니다...', false);
     callApi('getStudent').then(res => {
       if (res.ok) {
         studentInfo = res;
@@ -369,7 +368,7 @@ function handleGoogleCredential(response) {
         showLoginNotice(res.message || '등록된 학생 정보가 없어요.', true);
       }
     }).catch(err => showLoginNotice('서버 연결 실패: ' + err.message, true));
-  } catch (e) { showLoginNotice('로그인 처리 중 오류가 발생했어요', true); }
+  } catch (e) { showLoginNotice('로그인 처리 중 오류 발생', true); }
 }
 
 function showLoginNotice(msg, isError) {
@@ -435,7 +434,7 @@ function renderSimulator() {
     div.innerHTML = fHtml + cHtml; contentArea.appendChild(div);
   });
   
-  const finalBtn = document.createElement('button'); finalBtn.id = 'btn-final'; finalBtn.className = 'tab-btn'; finalBtn.innerText = '제출하기';
+  const finalBtn = document.createElement('button'); finalBtn.id = 'btn-final'; finalBtn.className = 'tab-btn'; finalBtn.innerText = '최종 설계서 제출';
   finalBtn.onclick = () => openTab('final'); tabBar.appendChild(finalBtn);
   updateUI();
 }
@@ -478,7 +477,7 @@ function applyPreset(type) {
 function clearPreset() { document.querySelectorAll('.subject-card').forEach(c => c.classList.remove('highlight-preset')); }
 
 function handleSelect(el, limit) {
-  if (document.querySelectorAll(`.${el.className}:checked`).length > limit) { el.checked = false; alert(`해당 영역은 최대 ${limit}과목만 선택 가능해요.`); }
+  if (document.querySelectorAll(`.${el.className}:checked`).length > limit) { el.checked = false; alert(`해당 영역은 최대 ${limit}과목만 선택 가능합니다.`); }
   updateUI();
 }
 
@@ -629,7 +628,7 @@ function saveAsImage() {
 
 function loadCheckData() {
   const contentArea = document.getElementById('check-content');
-  contentArea.innerHTML = '<div style="text-align:center; padding:40px;"><span class="spinner"></span> 제출 내역 불러오는 중...</div>';
+  contentArea.innerHTML = '<div style="text-align:center; padding:40px;"><span class="spinner"></span> 제출 내역을 불러오는 중이에요...</div>';
   callApi('getSubmission').then(res => {
     if (!res.ok || !res.hasSubmitted) {
       contentArea.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-sub);">제출된 과목 선택 내역이 없어요.</div>'; return;
