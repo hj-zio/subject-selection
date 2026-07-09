@@ -783,7 +783,7 @@
     // ==========================================
     // [설정] 구글 앱스크립트 배포 URL 입력 필수
     // ==========================================
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbw2nJynXOs8QzK8VJZ3fwqhI-YchHn3EzIb8fJecL3mVfvMu7irSBhcoyXQvV3CEwI/exec';
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbxzvHm95uelPpz8lW6nYi_-VZOyVupwRauToI69lU5n-xJCTqRq88C5M4-myjAIbpw/exec';
     const CLIENT_ID = '209856790601-foujcjpmor0acnsu4iv7avev4hj0jj0n.apps.googleusercontent.com';
 
     let idToken = null;
@@ -865,54 +865,62 @@
     }
 
     function callApi(action, extraData = {}) {
-      // 호출할 파라미터 구성
-      const payload = {
-        action: action,
-        token: idToken || '',
-        selections: extraData.selections ? JSON.stringify(extraData.selections) : ''
-      };
+      return new Promise((resolve, reject) => {
+        const cbName = '_gas_' + Math.random().toString(36).substring(2, 9);
 
-      // URLSearchParams로 쿼리 스트링 변환
-      const params = new URLSearchParams(payload);
-
-      // fetch 요청 (Redirect 처리 및 쿠키 개입 차단)
-      return fetch(`${GAS_URL}?${params.toString()}`, {
-        method: 'GET',
-        mode: 'cors',
-        redirect: 'follow'
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('네트워크 응답 실패');
-          }
-          return response.json(); // GAS에서 ContentService로 JSON 반환 시
-        })
-        .catch(err => {
-          return new Promise((resolve, reject) => {
-            const cbName = '_gas_' + Math.random().toString(36).substring(2, 9);
-            const fallbackParams = new URLSearchParams({
-              action,
-              cb: cbName,
-              _nc: Date.now()
-            });
-            if (extraData.selections) fallbackParams.set('selections', JSON.stringify(extraData.selections));
-
-            window[cbName] = (data) => {
-              delete window[cbName];
-              if (script.parentNode) script.parentNode.removeChild(script);
-              resolve(data);
-            };
-
-            const script = document.createElement('script');
-            script.src = `${GAS_URL}?${fallbackParams.toString()}`;
-            script.onerror = () => {
-              delete window[cbName];
-              if (script.parentNode) script.parentNode.removeChild(script);
-              reject(new Error('네트워크 응답 오류: 브라우저 보안 정책에 의해 요청이 차단되었어요.'));
-            };
-            document.head.appendChild(script);
-          });
+        // URLSearchParams 생성
+        const params = new URLSearchParams({
+          action,
+          cb: cbName,
+          _nc: Date.now(),
+          authuser: 0  // 브라우저의 꼬인 계정 세션을 무시하고 백엔드 요청 실행
         });
+
+        if (idToken) {
+          // idToken 인코딩 안전 처리
+          params.set('token', encodeURIComponent(idToken));
+        }
+        if (extraData.selections) {
+          params.set('selections', JSON.stringify(extraData.selections));
+        }
+
+        const script = document.createElement('script');
+
+        // 콜백 함수 정리 및 타임아웃 핸들러
+        let isFinished = false;
+        const cleanup = () => {
+          isFinished = true;
+          if (window[cbName]) delete window[cbName];
+          if (script.parentNode) script.parentNode.removeChild(script);
+          if (timeoutId) clearTimeout(timeoutId);
+        };
+
+        // 10초 타임아웃 설정
+        const timeoutId = setTimeout(() => {
+          if (!isFinished) {
+            cleanup();
+            reject(new Error('서버 응답 시간 초과 (네트워크 상태 또는 구글 계정 세션을 확인하세요)'));
+          }
+        }, 10000);
+
+        // 성공 시 실행
+        window[cbName] = (data) => {
+          cleanup();
+          resolve(data);
+        };
+
+        // 에러 시 실행
+        script.onerror = (e) => {
+          cleanup();
+          reject(new Error('네트워크 응답 오류: 브라우저 보안 정책에 의해 요청이 차단되었어요..'));
+        };
+
+        // 갤럭시탭/모바일 브라우저 CORS/보안 우회 설정
+        script.async = true;
+        script.src = `${GAS_URL}?${params.toString()}`;
+
+        document.head.appendChild(script);
+      });
     }
 
     function chooseMenu2026(type) {
