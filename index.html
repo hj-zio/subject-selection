@@ -826,7 +826,7 @@
       const checkGoogle = setInterval(() => {
         if (typeof google !== 'undefined' && google.accounts) {
           clearInterval(checkGoogle);
-          google.accounts.id.initialize({ client_id: CLIENT_ID, callback: handleGoogleCredential });
+          google.accounts.id.initialize({ client_id: CLIENT_ID, callback: handleGoogleCredential, auto_select: false });
           const wrap = document.getElementById('g-btn-wrap'); wrap.innerHTML = '';
           google.accounts.id.renderButton(wrap, { type: 'standard', theme: 'outline', size: 'large', width: 300, locale: 'ko' });
         }
@@ -867,24 +867,20 @@
       return new Promise((resolve, reject) => {
         const cbName = '_gas_' + Math.random().toString(36).substring(2, 9);
 
-        // 캐시 방지(_nc) 및 안전한 URL 파라미터 구성
-        const params = new URLSearchParams({
-          action: action,
-          cb: cbName,
-          _nc: Date.now()
-        });
+        // URLSearchParams 대신 스크립트 주소 쿼리를 직접 구성 (구글 다중 세션 쿠키 개입 방지)
+        let url = `${GAS_URL}?action=${encodeURIComponent(action)}&cb=${cbName}&_nc=${Date.now()}`;
 
         if (idToken) {
-          // idToken 특수문자 안전 인코딩
-          params.set('token', encodeURIComponent(idToken));
+          // idToken을 URL Safe 문자열로 확실히 인코딩
+          url += `&token=${encodeURIComponent(idToken)}`;
         }
+
         if (extraData.selections) {
-          params.set('selections', JSON.stringify(extraData.selections));
+          url += `&selections=${encodeURIComponent(JSON.stringify(extraData.selections))}`;
         }
 
         const script = document.createElement('script');
 
-        // 정리 함수
         const cleanup = () => {
           delete window[cbName];
           if (script.parentNode) script.parentNode.removeChild(script);
@@ -896,15 +892,17 @@
           resolve(data);
         };
 
-        // 실패 콜백 (모바일 크롬 보안 차단 예외 처리)
+        // 에러 콜백
         script.onerror = () => {
           cleanup();
-          reject(new Error('네트워크 응답 오류 (브라우저 보안 차단 또는 세션 오류)'));
+          reject(new Error('네트워크 응답 오류: 구글 다중 계정 세션 충돌'));
         };
 
-        // 안드로이드 크롬 크로스 도메인 보안 정책 회피 옵션 추가
+        // 안드로이드 크롬 보안 우회 필수 속성
+        script.type = 'text/javascript';
         script.async = true;
-        script.src = `${GAS_URL}?${params.toString()}`;
+        script.crossOrigin = 'anonymous'; // 구글 브라우저 쿠키 송신을 차단하여 세션 꼬임 우회
+        script.src = url;
 
         document.head.appendChild(script);
       });
