@@ -863,21 +863,19 @@
       document.getElementById(screenId).classList.add('active');
       window.scrollTo({ top: 0, behavior: 'smooth' }); // 최상단 스크롤 리셋
     }
-
     function callApi(action, extraData = {}) {
       return new Promise((resolve, reject) => {
         const cbName = '_gas_' + Math.random().toString(36).substring(2, 9);
 
-        // URLSearchParams 생성
+        // 캐시 방지(_nc) 및 안전한 URL 파라미터 구성
         const params = new URLSearchParams({
-          action,
+          action: action,
           cb: cbName,
-          _nc: Date.now(),
-          authuser: 0  // 브라우저의 꼬인 계정 세션을 무시하고 백엔드 요청 실행
+          _nc: Date.now()
         });
 
         if (idToken) {
-          // idToken 인코딩 안전 처리
+          // idToken 특수문자 안전 인코딩
           params.set('token', encodeURIComponent(idToken));
         }
         if (extraData.selections) {
@@ -886,36 +884,25 @@
 
         const script = document.createElement('script');
 
-        // 콜백 함수 정리 및 타임아웃 핸들러
-        let isFinished = false;
+        // 정리 함수
         const cleanup = () => {
-          isFinished = true;
-          if (window[cbName]) delete window[cbName];
+          delete window[cbName];
           if (script.parentNode) script.parentNode.removeChild(script);
-          if (timeoutId) clearTimeout(timeoutId);
         };
 
-        // 10초 타임아웃 설정
-        const timeoutId = setTimeout(() => {
-          if (!isFinished) {
-            cleanup();
-            reject(new Error('서버 응답 시간 초과 (네트워크 상태 또는 구글 계정 세션을 확인하세요)'));
-          }
-        }, 10000);
-
-        // 성공 시 실행
+        // 성공 콜백
         window[cbName] = (data) => {
           cleanup();
           resolve(data);
         };
 
-        // 에러 시 실행
-        script.onerror = (e) => {
+        // 실패 콜백 (모바일 크롬 보안 차단 예외 처리)
+        script.onerror = () => {
           cleanup();
-          reject(new Error('네트워크 응답 오류: 브라우저 보안 정책에 의해 요청이 차단되었어요..'));
+          reject(new Error('네트워크 응답 오류 (브라우저 보안 차단 또는 세션 오류)'));
         };
 
-        // 갤럭시탭/모바일 브라우저 CORS/보안 우회 설정
+        // 안드로이드 크롬 크로스 도메인 보안 정책 회피 옵션 추가
         script.async = true;
         script.src = `${GAS_URL}?${params.toString()}`;
 
