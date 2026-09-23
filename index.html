@@ -794,7 +794,7 @@
         // ==========================================
         // [설정] 구글 앱스크립트 배포 URL 입력 필수
         // ==========================================
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbyHiadmp-SIFMaoSyYVb37DiwppX_-w0X9HfZ_XAUhsAwGDYe_HFD0om0z9u1Onr4E/exec';
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbzhJ-lvIczXpdj4H2EN_3jbUqp9Ge5g0ZuvKOnuZDNJJOXAq9IGH1Pb8YdsM17T7MY/exec';
         const CLIENT_ID = '209856790601-foujcjpmor0acnsu4iv7avev4hj0jj0n.apps.googleusercontent.com';
 
         let idToken = null;
@@ -1194,9 +1194,13 @@
 
             callApi('getSubmission').then(res => {
                 if (!res.ok || !res.hasSubmitted) {
+                    console.log('[조회 응답 전체]', res);
+                    console.log('[선택과목 데이터]', res.selections);
+                    console.log('[선택과목 데이터 타입]', Array.isArray(res.selections) ? '배열' : typeof res.selections);
                     contentArea.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-sub);">제출된 과목 선택 내역이 없어요.</div>';
                     return;
                 }
+
                 console.log('[조회 응답 전체]', res);
                 console.log('[선택과목 데이터]', res.selections);
                 console.log('[선택과목 데이터 타입]', Array.isArray(res.selections) ? '배열' : typeof res.selections);
