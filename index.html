@@ -841,10 +841,11 @@
         if (!email.endsWith('@pess.cnehs.kr')) {
           showLoginNotice('학교 공식 계정(@pess.cnehs.kr)으로만 로그인할 수 있어요.', true); return;
         }
-        showLoginNotice('인증 성공! 학적 정보를 확인 중입니다...', false);
+        showLoginNotice('인증 성공! 학적 정보를 확인 중이에요...', false);
         callApi('getStudent').then(res => {
           if (res.ok) {
             studentInfo = res;
+            console.log('getStudent 응답:', res);
             document.getElementById('user-display-main').textContent = `${res.studentId} ${res.name} (${res.email})`;
             showScreen('sc-main-portal');
           } else {
