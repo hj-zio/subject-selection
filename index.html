@@ -1197,6 +1197,9 @@
                     contentArea.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-sub);">제출된 과목 선택 내역이 없어요.</div>';
                     return;
                 }
+                console.log('[조회 응답 전체]', res);
+                console.log('[선택과목 데이터]', res.selections);
+                console.log('[선택과목 데이터 타입]', Array.isArray(res.selections) ? '배열' : typeof res.selections);
 
                 let html = `<div class="report-print-area">
             <div class="report-header" style="margin-bottom:20px;">
